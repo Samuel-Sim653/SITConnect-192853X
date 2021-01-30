@@ -1,0 +1,31 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="SITConnect.master.cs" Inherits="SITConnect.SITConnect" %>
+
+<!DOCTYPE html> 
+  
+<body>  
+<header id="header">  
+<h1>SITConnect</h1>  
+</header>  
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+            <a class="nav-link" href="Login.aspx">Login</a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="Register.aspx">Register</a>
+        </li>
+ 
+    </ul>
+</div>
+
+<div id="con">  
+    <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">  
+          
+    </asp:ContentPlaceHolder>  
+</div>  
+  
+</body>  
+  
+
+ 
+ 
