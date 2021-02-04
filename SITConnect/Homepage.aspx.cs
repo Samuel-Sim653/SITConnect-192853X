@@ -207,7 +207,7 @@ namespace SITConnect
             }
             else
             {
-                lbl_Message.Text = ("Password Change cooldown time is 5 minutes");
+                lbl_Message.Text = ("Password Change cooldown time is 1 minute");
                 lbl_Message.ForeColor = System.Drawing.Color.Red;
 
             }

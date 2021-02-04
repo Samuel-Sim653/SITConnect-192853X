@@ -77,7 +77,6 @@ namespace SITConnect
                         rng.GetBytes(saltByte);
 
                         string newpwdWithSalt = newpassword + dbSalt;
-                        byte[] plainHash = hashing.ComputeHash(Encoding.UTF8.GetBytes(newpassword));
                         byte[] newhashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(newpwdWithSalt));
                         NewHash = Convert.ToBase64String(newhashWithSalt);
 
@@ -349,8 +348,8 @@ namespace SITConnect
                     cmd.Parameters.AddWithValue("@PasswordHash", NewHash);
                     cmd.Parameters.AddWithValue("@PasswordSalt", getDBSalt(email));
                     cmd.Parameters.AddWithValue("@PrevPasswordHash", getDBHash(email));
-                    cmd.Parameters.AddWithValue("@MinPasswordAge", DateTime.Now.AddMinutes(5));
-                    cmd.Parameters.AddWithValue("@MaxPasswordAge", DateTime.Now.AddMinutes(15));
+                    cmd.Parameters.AddWithValue("@MinPasswordAge", DateTime.Now.AddMinutes(1));
+                    cmd.Parameters.AddWithValue("@MaxPasswordAge", DateTime.Now.AddMinutes(3));
 
 
                     cmd.Connection = con;

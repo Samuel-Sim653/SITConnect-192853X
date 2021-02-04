@@ -37,103 +37,118 @@ namespace SITConnect
         protected void btn_Login_Click(object sender, EventArgs e)
         {
 
-            string email = HttpUtility.HtmlEncode(tb_email.Text).ToString().Trim();
-            string password = HttpUtility.HtmlEncode(tb_pwd.Text).ToString().Trim();
-
-            int status = 0;
-            DateTime MaxPasswordAge = default;
-            DateTime TimeNow = DateTime.Now;
-
-            SqlConnection con = new SqlConnection(MYDBConnectionString);
-            string sql = "SELECT Status, MaxPasswordAge FROM Users WHERE Email=@Email";
-            SqlCommand cmd = new SqlCommand(sql, con);
-            cmd.Parameters.AddWithValue("@Email", email);
-            try
+            if (tb_pwd.Text == "" || tb_email.Text == "") 
             {
-                con.Open();
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        if (reader["Status"] != DBNull.Value)
-                        {
-                            status = Convert.ToInt32(reader["Status"].ToString());
-                        }
+                lb_error.Text = "Please do not leave field empty";
+                lb_error.ForeColor = Color.Red;
 
-                        if (reader["MaxPasswordAge"] != DBNull.Value)
+            } else { 
+
+                string email = HttpUtility.HtmlEncode(tb_email.Text).ToString().Trim();
+                string password = HttpUtility.HtmlEncode(tb_pwd.Text).ToString().Trim();
+
+                int status = 0;
+                DateTime MaxPasswordAge = default;
+                DateTime TimeNow = DateTime.Now;
+
+                SqlConnection con = new SqlConnection(MYDBConnectionString);
+                string sql = "SELECT Status, MaxPasswordAge FROM Users WHERE Email=@Email";
+                SqlCommand cmd = new SqlCommand(sql, con);
+                cmd.Parameters.AddWithValue("@Email", email);
+                try
+                {
+                    con.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
                         {
-                            MaxPasswordAge = Convert.ToDateTime(reader["MaxPasswordAge"].ToString());
+                            if (reader["Status"] != DBNull.Value)
+                            {
+                                status = Convert.ToInt32(reader["Status"].ToString());
+                            }
+
+                            if (reader["MaxPasswordAge"] != DBNull.Value)
+                            {
+                                MaxPasswordAge = Convert.ToDateTime(reader["MaxPasswordAge"].ToString());
+                            }
                         }
                     }
-                }
-            }//try
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString());
-            }
-            finally
-            {
-                con.Close();
-            }
-             
-            SHA512Managed hashing = new SHA512Managed();
-            string dbHash = getDBHash(email);
-            string dbSalt = getDBSalt(email);
-
-            try
-            {
-                if (status < 3) 
+                }//try
+                catch (Exception ex)
                 {
-                    if (dbSalt != null && dbSalt.Length > 0 && dbHash != null && dbHash.Length > 0)
+                    throw new Exception(ex.ToString());
+                }
+                finally
+                {
+                    con.Close();
+                }
+
+                SHA512Managed hashing = new SHA512Managed();
+                string dbHash = getDBHash(email);
+                string dbSalt = getDBSalt(email);
+
+                if (dbHash == null) {
+                    lb_error.Text = "Email or Password is not valid. Please try again.";
+                    lb_error.ForeColor = Color.Red;
+                }
+
+                try
+                {
+                    if (status < 3)
                     {
-                        string pwdWithSalt = password + dbSalt;
-                        byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
-                        string userHash = Convert.ToBase64String(hashWithSalt);
-
-                        if (userHash.Equals(dbHash))
+                        if (dbSalt != null && dbSalt.Length > 0 && dbHash != null && dbHash.Length > 0)
                         {
+                            string pwdWithSalt = password + dbSalt;
+                            byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
+                            string userHash = Convert.ToBase64String(hashWithSalt);
 
-                            LoginPass(email);
-
-                            Session["LoggedIn"] = email;
-
-                            string guid = Guid.NewGuid().ToString();
-                            Session["AuthToken"] = guid;
-
-                            Response.Cookies.Add(new HttpCookie("AuthToken", guid));
-
-                            int diff = DateTime.Compare(TimeNow, MaxPasswordAge);
-
-                            if (diff > 0)
+                            if (userHash.Equals(dbHash))
                             {
-                                Response.Redirect("ChangePassword.aspx?status=passwordexpired", false);
+
+                                LoginPass(email);
+
+                                Session["LoggedIn"] = email;
+
+                                string guid = Guid.NewGuid().ToString();
+                                Session["AuthToken"] = guid;
+
+                                Response.Cookies.Add(new HttpCookie("AuthToken", guid));
+
+                                int diff = DateTime.Compare(TimeNow, MaxPasswordAge);
+
+                                if (diff > 0)
+                                {
+                                    Response.Redirect("ChangePassword.aspx?status=passwordexpired", false);
+                                }
+                                else
+                                {
+                                    Response.Redirect("Homepage.aspx", false);
+                                }
                             }
                             else
                             {
-                                Response.Redirect("Homepage.aspx", false);
+                                LoginFail(email);
+                                lb_error.Text = "Email or Password is not valid. Please try again.";
+                                lb_error.ForeColor = Color.Red;
                             }
                         }
-                        else
-                        {
-                            LoginFail(email);
-                            lb_error.Text = "Email or Password is not valid. Please try again.";
-                            lb_error.ForeColor = Color.Red;
-                        }
                     }
-                }
-                else
-                {
-                    lb_error.Text = "Account is locked or does not exist.";
-                    lb_error.ForeColor = Color.Red;
-                }
-                
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString());
-            }
-            finally { }
+                    else
+                    {
+                        lb_error.Text = "Account is locked.";
+                        lb_error.ForeColor = Color.Red;
+                    }
 
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.ToString());
+                }
+                finally { }
+            }
+
+
+          
         }
 
         protected string getDBHash(string email)

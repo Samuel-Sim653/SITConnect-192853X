@@ -113,7 +113,7 @@ namespace SITConnect
                             cmd.Parameters.AddWithValue("@Status", 0);
                             cmd.Parameters.AddWithValue("@IV", Convert.ToBase64String(IV));
                             cmd.Parameters.AddWithValue("@Keys", Convert.ToBase64String(Key));
-                            cmd.Parameters.AddWithValue("@MaxPasswordAge", DateTime.Now.AddMinutes(15));
+                            cmd.Parameters.AddWithValue("@MaxPasswordAge", DateTime.Now.AddMinutes(3));
 
                             cmd.Connection = con;
                             con.Open();

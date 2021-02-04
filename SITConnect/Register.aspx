@@ -219,7 +219,7 @@
                 <td class="style3" style="height: 55px">
                     Date Of Birth</td>
                 <td class="style2" style="height: 55px">
-                    <asp:TextBox ID="tb_dob" runat="server" TextMode="Date" onkeyup="javascript:validatedob()" max="2010-01-01" Width="167px"></asp:TextBox>
+                    <asp:TextBox ID="tb_dob" runat="server" TextMode="Date" onkeyup="javascript:validatedob()" min="1900-01-01" max="2010-01-01" Width="167px"></asp:TextBox>
                     <asp:Label ID="lbl_dob_errors" runat="server" ForeColor="Red"></asp:Label>
                 </td>
             </tr>
