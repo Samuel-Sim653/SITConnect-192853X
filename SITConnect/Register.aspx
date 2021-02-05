@@ -183,7 +183,7 @@
                 <td class="style3" style="height: 55px">
                     Credit Card Number&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
                 <td class="style2" style="height: 55px">
-                    <asp:TextBox ID="tb_credit" runat="server" onkeyup="javascript:validatecredit()" TextMode="Password" maxLength="16" min="0" > </asp:TextBox>
+                    <asp:TextBox ID="tb_credit" runat="server" onkeyup="javascript:validatecredit()" TextMode="Password" maxLength="16" min="15" > </asp:TextBox>
                     <asp:Label ID="lbl_credit_errors" runat="server" ForeColor="Red"></asp:Label>
                 </td>
             </tr>
