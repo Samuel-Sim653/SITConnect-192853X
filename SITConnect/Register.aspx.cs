@@ -50,7 +50,7 @@ namespace SITConnect
 
             if (validInput)
             {
-                string pwd = tb_pwd.Text.ToString().Trim(); ;
+                string pwd = HttpUtility.HtmlEncode(tb_pwd.Text).ToString().Trim();
                 //Generate random "salt"
                 RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
                 byte[] saltByte = new byte[8];
@@ -60,16 +60,18 @@ namespace SITConnect
                 salt = Convert.ToBase64String(saltByte);
                 SHA512Managed hashing = new SHA512Managed();
                 string pwdWithSalt = pwd + salt;
-                byte[] plainHash = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwd));
+                
                 byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
                 finalHash = Convert.ToBase64String(hashWithSalt);
+
                 RijndaelManaged cipher = new RijndaelManaged();
                 cipher.GenerateKey();
                 Key = cipher.Key;
                 IV = cipher.IV;
+
                 createAccount();
 
-                Response.Redirect("Login.aspx?status=registered");
+                Response.Redirect("Login.aspx?status=" + HttpUtility.UrlEncode("registered"));
 
             }
 
@@ -125,7 +127,11 @@ namespace SITConnect
                             cmd.Parameters.AddWithValue("@PasswordHash", finalHash);
                             cmd.Parameters.AddWithValue("@PasswordSalt", salt);
                             cmd.Parameters.AddWithValue("@Dob",dob.Trim());
+
+
                             cmd.Parameters.AddWithValue("@Status", 0);
+
+
                             cmd.Parameters.AddWithValue("@IV", Convert.ToBase64String(IV));
                             cmd.Parameters.AddWithValue("@Keys", Convert.ToBase64String(Key));
                             cmd.Parameters.AddWithValue("@MaxPasswordAge", DateTime.Now.AddMinutes(3));
